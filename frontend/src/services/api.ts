@@ -7,8 +7,9 @@ import {
   StatsResponse,
 } from "./types";
 
+const API_ROOT = import.meta.env.VITE_API_URL || "";
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: API_ROOT ? `${API_ROOT}/api` : "/api",
   timeout: 60000,
 });
 

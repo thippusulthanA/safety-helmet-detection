@@ -73,8 +73,15 @@ export const LiveCamera: React.FC = () => {
 
   // Connect WebSocket
   const connectWebSocket = useCallback(() => {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/api/stream`;
+    const apiBase = import.meta.env.VITE_API_URL || "";
+    let wsUrl = "";
+    if (apiBase) {
+      const wsBase = apiBase.replace(/^http:/, "ws:").replace(/^https:/, "wss:");
+      wsUrl = `${wsBase}/api/stream`;
+    } else {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      wsUrl = `${protocol}//${window.location.host}/api/stream`;
+    }
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
