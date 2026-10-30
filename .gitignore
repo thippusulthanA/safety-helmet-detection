@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.pytest_cache/
+*.egg-info/
+
+# Frontend / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database & Runtime Uploads
+backend/*.db
+backend/*.db-journal
+backend/static/snapshots/*.jpg
+backend/static/processed_videos/*.mp4
+backend/static/temp/
+!backend/static/snapshots/.gitkeep
+!backend/static/processed_videos/.gitkeep
+
+# Heavy ML Datasets & Training Runs (download via Kaggle per ML/README.md)
+docs/archive/
+backend/ml/dataset/
+backend/ml/runs/
+runs/
+*.cache
+
+# Temporary & Test Files
+test_sample.jpg
+test_video.mp4
+test_video_api.py
+test_websocket.py
+capture_all_screenshots.js
+frontend/capture_*.cjs
+frontend/capture_*.js
+run_and_capture.py
+/yolov8s.pt
+backend/models/yolov8s.pt
+
+# Environment & Secrets
+.env
+.DS_Store
+Thumbs.db
+
