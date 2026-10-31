@@ -73,7 +73,10 @@ export const LiveCamera: React.FC = () => {
 
   // Connect WebSocket
   const connectWebSocket = useCallback(() => {
-    const apiBase = import.meta.env.VITE_API_URL || "";
+    const apiBase =
+      import.meta.env.VITE_API_URL !== undefined && import.meta.env.VITE_API_URL !== ""
+        ? import.meta.env.VITE_API_URL
+        : (import.meta.env.PROD ? "https://safety-helmet-detection-1.onrender.com" : "");
     let wsUrl = "";
     if (apiBase) {
       const wsBase = apiBase.replace(/^http:/, "ws:").replace(/^https:/, "wss:");

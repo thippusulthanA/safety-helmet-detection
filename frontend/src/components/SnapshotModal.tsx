@@ -1,6 +1,7 @@
 import React from "react";
 import { X, ExternalLink, Calendar, MapPin, AlertTriangle } from "lucide-react";
 import { ViolationLogItem } from "../services/types";
+import { getMediaUrl } from "../services/api";
 
 interface SnapshotModalProps {
   log: ViolationLogItem | null;
@@ -34,7 +35,7 @@ export const SnapshotModal: React.FC<SnapshotModalProps> = ({ log, onClose }) =>
         <div className="bg-slate-950 flex items-center justify-center p-4 min-h-[300px] max-h-[500px] overflow-hidden">
           {log.snapshot_path ? (
             <img
-              src={log.snapshot_path}
+              src={getMediaUrl(log.snapshot_path)}
               alt={`Violation Snapshot #${log.id}`}
               className="max-h-[460px] w-auto object-contain rounded-lg shadow-md"
             />
@@ -62,7 +63,7 @@ export const SnapshotModal: React.FC<SnapshotModalProps> = ({ log, onClose }) =>
             </span>
             {log.snapshot_path && (
               <a
-                href={log.snapshot_path}
+                href={getMediaUrl(log.snapshot_path)}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 px-3 py-1 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 font-medium transition-colors"

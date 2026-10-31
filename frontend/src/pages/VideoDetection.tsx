@@ -7,7 +7,7 @@ import {
   Film,
   AlertOctagon,
 } from "lucide-react";
-import { submitVideo, getVideoStatus } from "../services/api";
+import { submitVideo, getVideoStatus, getMediaUrl } from "../services/api";
 import { VideoDetectionResponse } from "../services/types";
 
 export const VideoDetection: React.FC = () => {
@@ -205,7 +205,7 @@ export const VideoDetection: React.FC = () => {
                   autoPlay
                   loop
                   className="w-full max-h-[460px] rounded-lg shadow-xl"
-                  src={jobState.annotated_video_url}
+                  src={getMediaUrl(jobState.annotated_video_url)}
                 >
                   Your browser does not support HTML5 video playback.
                 </video>

@@ -7,7 +7,22 @@ import {
   StatsResponse,
 } from "./types";
 
-const API_ROOT = import.meta.env.VITE_API_URL || "";
+export const DEFAULT_BACKEND_URL = "https://safety-helmet-detection-1.onrender.com";
+
+export const API_ROOT =
+  import.meta.env.VITE_API_URL !== undefined && import.meta.env.VITE_API_URL !== ""
+    ? import.meta.env.VITE_API_URL
+    : (import.meta.env.PROD ? DEFAULT_BACKEND_URL : "");
+
+export const getMediaUrl = (path: string | null | undefined): string => {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+    return path;
+  }
+  const root = API_ROOT || (import.meta.env.PROD ? DEFAULT_BACKEND_URL : "");
+  return `${root}${path}`;
+};
+
 const api = axios.create({
   baseURL: API_ROOT ? `${API_ROOT}/api` : "/api",
   timeout: 60000,
