@@ -13,6 +13,11 @@ import numpy as np
 try:
     import torch
     from ultralytics import YOLO
+    if torch:
+        try:
+            torch.set_num_threads(2)
+        except Exception:
+            pass
 except ImportError:
     torch = None
     YOLO = None
@@ -106,14 +111,40 @@ class YOLOv8Detector:
                 "annotated_np": annotated_bgr
             }
 
-        # Ultralytics inference
-        results = self.model(
-            image_bgr,
-            conf=conf_threshold,
-            iou=iou_threshold,
-            device=self.device,
-            verbose=False
-        )
+        # Memory safeguard: resize large images to prevent OOM on cloud containers
+        max_dim = max(h, w)
+        if max_dim > 1024:
+            scale_ratio = 1024.0 / max_dim
+            infer_w = int(w * scale_ratio)
+            infer_h = int(h * scale_ratio)
+            infer_img = cv2.resize(image_bgr, (infer_w, infer_h), interpolation=cv2.INTER_AREA)
+            scale_x = w / infer_w
+            scale_y = h / infer_h
+        else:
+            infer_img = image_bgr
+            scale_x = 1.0
+            scale_y = 1.0
+
+        # Ultralytics inference with torch.no_grad() and imgsz=384 for low memory footprint
+        if torch:
+            with torch.no_grad():
+                results = self.model(
+                    infer_img,
+                    conf=conf_threshold,
+                    iou=iou_threshold,
+                    imgsz=384,
+                    device=self.device,
+                    verbose=False
+                )
+        else:
+            results = self.model(
+                infer_img,
+                conf=conf_threshold,
+                iou=iou_threshold,
+                imgsz=384,
+                device=self.device,
+                verbose=False
+            )
 
         annotated_bgr = image_bgr.copy()
 
@@ -126,6 +157,13 @@ class YOLOv8Detector:
                 confidence = float(box.conf[0].item())
                 xyxy = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
                 x1, y1, x2, y2 = [int(v) for v in xyxy]
+
+                # Rescale coordinates to original image size if image was downscaled
+                if scale_x != 1.0 or scale_y != 1.0:
+                    x1 = int(x1 * scale_x)
+                    y1 = int(y1 * scale_y)
+                    x2 = int(x2 * scale_x)
+                    y2 = int(y2 * scale_y)
 
                 # Constrain coordinates to image boundaries
                 x1, y1 = max(0, x1), max(0, y1)
