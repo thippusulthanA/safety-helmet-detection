@@ -72,12 +72,30 @@ def get_system_health():
     )
 
 
-@app.get("/", tags=["Root"])
-def root():
-    return {
-        "app": settings.PROJECT_NAME,
-        "version": settings.VERSION,
-        "status": "running",
-        "docs": "/docs"
-    }
+from pathlib import Path
+from fastapi.responses import FileResponse
+
+# Serve Frontend SPA if built
+FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    assets_dir = FRONTEND_DIST / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="frontend-assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(full_path: str):
+        # Allow static files in root like favicon, manifest
+        file_path = FRONTEND_DIST / full_path
+        if full_path and file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(FRONTEND_DIST / "index.html")
+else:
+    @app.get("/", tags=["Root"])
+    def root():
+        return {
+            "app": settings.PROJECT_NAME,
+            "version": settings.VERSION,
+            "status": "running",
+            "docs": "/docs"
+        }
 
